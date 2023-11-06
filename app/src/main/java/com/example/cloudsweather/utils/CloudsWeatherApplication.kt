@@ -1,4 +1,4 @@
-package com.example.cloudsweather
+package com.example.cloudsweather.utils
 
 
 import android.annotation.SuppressLint

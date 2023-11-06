@@ -1,10 +1,12 @@
 package com.example.cloudsweather.logic.Network
 
 import android.app.appsearch.SearchResult
+import com.example.cloudsweather.logic.Model.RealtimeResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.http.Query
+import java.lang.RuntimeException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
@@ -16,6 +18,12 @@ object CloudsWeatherNetwork {
 
     suspend fun searchPlaces(query: String) = placeService.searchPlaces(query).await()
 
+    private val weatherService = ServiceCreator.create<WeatherService>()
+
+    suspend fun getDailyWeather(lng:String,lat:String) = weatherService.getDailyWeather(lng,lat).await()
+
+    suspend fun getRealtimeWeather(lng: String,lat: String) = weatherService.getRealtimeWeather(lng, lat).await()
+
     private suspend fun <T> Call<T>.await():T{
         return suspendCoroutine { continuation -> enqueue(object :Callback<T>{
             override fun onResponse(call: Call<T>, response: Response<T>) {
@@ -23,7 +31,7 @@ object CloudsWeatherNetwork {
                 if (body != null){
                     continuation.resume(body)
                 }else{
-                    continuation.resumeWithException(java.lang.RuntimeException("response body is null"))
+                    continuation.resumeWithException(RuntimeException("response body is null"))
                 }
             }
 
@@ -33,4 +41,6 @@ object CloudsWeatherNetwork {
 
         }) }
     }
+
+
 }

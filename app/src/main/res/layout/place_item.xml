@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"
             android:textColor="?android:attr/textColorPrimary"
             android:textSize="20sp"
-            android:text="111111"
+            android:text="北京市"
             android:id="@+id/placeName"/>
 
         <TextView
@@ -29,7 +29,7 @@
             android:textSize="14sp"
             android:layout_marginTop="10dp"
             android:textColor="?android:attr/textColorSecondary"
-            android:text="5555555555555555555"/>
+            android:text="中国北京市"/>
 
 
 

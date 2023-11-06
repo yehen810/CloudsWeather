@@ -1,6 +1,7 @@
 package com.example.cloudsweather
 
 import android.widget.Toast
+import com.example.cloudsweather.utils.CloudsWeatherApplication
 
 
 fun String.showToast(duration: Int = Toast.LENGTH_SHORT){
