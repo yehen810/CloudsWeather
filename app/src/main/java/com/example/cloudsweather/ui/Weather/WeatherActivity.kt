@@ -7,8 +7,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.GravityCompat
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.cloudsweather.R
@@ -40,6 +43,25 @@ class WeatherActivity : BaseActivity() {
         //将状态栏设置为透明色
         window.statusBarColor = Color.TRANSPARENT
 
+        navBtn.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
+
+        drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener{
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {}
+
+            override fun onDrawerOpened(drawerView: View) {}
+
+            override fun onDrawerClosed(drawerView: View) {
+                //滑动菜单隐藏时，要隐藏搜索时显示的输入法
+                val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                manager.hideSoftInputFromWindow(drawerView.windowToken,InputMethodManager.HIDE_NOT_ALWAYS)
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {}
+
+        })
+
 
         if(viewModel.locationLng.isEmpty()){
             viewModel.locationLng = intent.getStringExtra("location_lng") ?: ""
@@ -63,10 +85,21 @@ class WeatherActivity : BaseActivity() {
                 "无法成功获取天气信息".showToast()
                 result.exceptionOrNull()?.printStackTrace()
             }
-
+            swipeRefresh.isRefreshing = false
         })
-        viewModel.refreshWeather(viewModel.locationLng,viewModel.locationLat)
+        //设置下拉刷新进度条的颜色
+        swipeRefresh.setColorSchemeResources(R.color.black)
+        swipeRefresh.setOnRefreshListener {
+            refreshWeather()
+        }
+        refreshWeather()
     }
+
+    fun refreshWeather(){
+        viewModel.refreshWeather(viewModel.locationLng,viewModel.locationLat)
+        swipeRefresh.isRefreshing = true
+    }
+
 
     private fun showWeatherInfo(weather: Weather) {
         placeName.text = viewModel.placeName

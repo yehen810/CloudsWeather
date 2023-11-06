@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.cloudsweather.MainActivity
 import com.example.cloudsweather.R
 import com.example.cloudsweather.showToast
 import com.example.cloudsweather.startActivity
@@ -32,7 +33,9 @@ class PlaceFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        if(viewModel.isPlaceSaved()){
+        //只有当碎片嵌入在MainActivity且网络请求数据成功的情况下，才能跳转页面
+        //activity is MainActivity判断是为了放置碎片嵌入WeatherActivity中执行时造成无限跳转的情况
+        if(viewModel.isPlaceSaved() && activity is MainActivity){
             val place = viewModel.getSavedPlace()
             context?.let {
                 startActivity<WeatherActivity>(it) {
