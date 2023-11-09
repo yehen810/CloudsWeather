@@ -33,6 +33,7 @@ class PlaceFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
+        //初始操作
         //只有当碎片嵌入在MainActivity且网络请求数据成功的情况下，才能跳转页面
         //activity is MainActivity判断是为了放置碎片嵌入WeatherActivity中执行时造成无限跳转的情况
         if(viewModel.isPlaceSaved() && activity is MainActivity){
@@ -47,19 +48,6 @@ class PlaceFragment : Fragment() {
             activity?.finish()
             return
         }
-
-/*        if (viewModel.isPlaceSaved()) {
-            val place = viewModel.getSavedPlace()
-            val intent = Intent(context, WeatherActivity::class.java).apply {
-                putExtra("location_lng", place.location.lng)
-                putExtra("location_lat", place.location.lat)
-                putExtra("place_name", place.name)
-            }
-            startActivity(intent)
-            activity?.finish()
-            return
-        }*/
-
 
         val layoutManager = LinearLayoutManager(activity)
         recyclerView.layoutManager = layoutManager

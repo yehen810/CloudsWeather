@@ -1,9 +1,7 @@
 package com.example.cloudsweather.ui.Weather
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,16 +13,13 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.cloudsweather.R
-import com.example.cloudsweather.logic.Model.Sky
 import com.example.cloudsweather.logic.Model.Weather
 import com.example.cloudsweather.logic.Model.getSky
 import com.example.cloudsweather.showToast
 import com.example.cloudsweather.utils.BaseActivity
-import com.example.cloudsweather.utils.CloudsWeatherApplication
 import com.example.cloudsweather.utils.LogUtil
 import kotlinx.android.synthetic.main.activity_weather.*
 import kotlinx.android.synthetic.main.forecast.*
-import kotlinx.android.synthetic.main.forecast_item.*
 import kotlinx.android.synthetic.main.life_index.*
 import kotlinx.android.synthetic.main.now.*
 import java.text.SimpleDateFormat
@@ -63,6 +58,7 @@ class WeatherActivity : BaseActivity() {
         })
 
 
+        //初始操作赋值
         if(viewModel.locationLng.isEmpty()){
             viewModel.locationLng = intent.getStringExtra("location_lng") ?: ""
         }
@@ -101,25 +97,30 @@ class WeatherActivity : BaseActivity() {
     }
 
 
+
+
     private fun showWeatherInfo(weather: Weather) {
         placeName.text = viewModel.placeName
         val realtime = weather.realtime
         val daily = weather.daily
 
+        LogUtil.e("daily",daily.toString())
+
         //填充now.xml布局中的数据
         val currentTempText = "${realtime.temperature.toInt()}°C"
+
         currentTemp.text = currentTempText
         currentSky.text = getSky(realtime.skycon).info
        /* val currentPM25Text = "空气指数${realtime.airQuality.api.chn.toInt()}"*/
 
         val currentPM25Text = "空气指数${realtime.airQuality.aqi.chn.toInt()}"
         currentAQI.text = currentPM25Text
-
         /*LogUtil.e("温度",realtime.temperature.toString())
         LogUtil.e("空气品质",realtime.airQuality.aqi.chn.toString())*/
 
-
         nowLayout.setBackgroundResource(getSky(realtime.skycon).bg)
+
+
 
         //填充forecast.xml布局中的数据
         forecastLayout.removeAllViews()
@@ -127,7 +128,7 @@ class WeatherActivity : BaseActivity() {
         for(i in 0 until days){
 
             val skycon = daily.skycon[i]
-            LogUtil.e("时间1",skycon.toString())
+            /*LogUtil.e("时间1",skycon.toString())*/
 
             val temperature = daily.temperature[i]
             val view = LayoutInflater.from(this).inflate(R.layout.forecast_item,forecastLayout,false)
@@ -140,7 +141,7 @@ class WeatherActivity : BaseActivity() {
             val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             dateInfo.text = simpleDateFormat.format(skycon.date)
 
-            LogUtil.e("时间",skycon.date.toString())
+            /*LogUtil.e("时间",skycon.date.toString())*/
 
             val sky = getSky(skycon.value)
             skyIcon.setImageResource(sky.icon)
@@ -158,5 +159,25 @@ class WeatherActivity : BaseActivity() {
         ultravioletText.text = lifeIndex.ultraviolet[0].desc
         carWashingText.text = lifeIndex.carWashing[0].desc
         weatherLayout.visibility = View.VISIBLE
+
+
+        viewModel.title = "${viewModel.placeName} ${getSky(realtime.skycon).info}"
+        viewModel.text = "现在温度${currentTempText},${currentPM25Text}"
+        viewModel.icon = getSky(realtime.skycon).icon
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.startForegroundService(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.stopForegroundService(this)
+    }
+
+    override fun onDestroy() {
+        viewModel.stopForegroundService(this)
+        super.onDestroy()
     }
 }
